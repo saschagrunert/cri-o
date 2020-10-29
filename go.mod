@@ -6,17 +6,17 @@ require (
 	github.com/BurntSushi/toml v0.3.1
 	github.com/Microsoft/go-winio v0.4.15-0.20200113171025-3fe6c5262873
 	github.com/blang/semver v3.5.1+incompatible
-	github.com/containerd/containerd v1.4.0
+	github.com/containerd/containerd v1.4.1
 	github.com/containerd/ttrpc v1.0.1
 	github.com/containernetworking/cni v0.8.0
 	github.com/containernetworking/plugins v0.8.7
-	github.com/containers/buildah v1.15.2
-	github.com/containers/common v0.21.0
+	github.com/containers/buildah v1.16.1
+	github.com/containers/common v0.22.0
 	github.com/containers/conmon v2.0.20+incompatible
-	github.com/containers/image/v5 v5.5.2
-	github.com/containers/libpod/v2 v2.0.6
+	github.com/containers/image/v5 v5.6.0
 	github.com/containers/ocicrypt v1.0.3
-	github.com/containers/storage v1.23.3
+	github.com/containers/podman/v2 v2.1.1
+	github.com/containers/storage v1.23.5
 	github.com/coreos/go-systemd/v22 v22.1.0
 	github.com/cpuguy83/go-md2man v1.0.10
 	github.com/creack/pty v1.1.11
@@ -30,16 +30,16 @@ require (
 	github.com/gogo/protobuf v1.3.1
 	github.com/golang/mock v1.4.3
 	github.com/google/renameio v0.1.0
-	github.com/google/uuid v1.1.1
+	github.com/google/uuid v1.1.2
 	github.com/grpc-ecosystem/go-grpc-middleware v1.2.0
 	github.com/hpcloud/tail v1.0.0
 	github.com/json-iterator/go v1.1.10
-	github.com/onsi/ginkgo v1.14.0
-	github.com/onsi/gomega v1.10.1
+	github.com/onsi/ginkgo v1.14.1
+	github.com/onsi/gomega v1.10.2
 	github.com/opencontainers/go-digest v1.0.0
 	github.com/opencontainers/image-spec v1.0.2-0.20200206005212-79b036d80240
 	github.com/opencontainers/runc v1.0.0-rc92
-	github.com/opencontainers/runtime-spec v1.0.3-0.20200728170252-4d89ac9fbff6
+	github.com/opencontainers/runtime-spec v1.0.3-0.20200817204227-f9c09b4ea1df
 	github.com/opencontainers/runtime-tools v0.9.1-0.20200714183735-07406c5828aa
 	github.com/opencontainers/selinux v1.6.0
 	github.com/pkg/errors v0.9.1

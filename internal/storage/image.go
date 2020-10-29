@@ -20,7 +20,7 @@ import (
 	istorage "github.com/containers/image/v5/storage"
 	"github.com/containers/image/v5/transports/alltransports"
 	"github.com/containers/image/v5/types"
-	"github.com/containers/libpod/v2/pkg/rootless"
+	"github.com/containers/podman/v2/pkg/rootless"
 	encconfig "github.com/containers/ocicrypt/config"
 	"github.com/containers/storage"
 	"github.com/containers/storage/pkg/reexec"
