@@ -75,6 +75,8 @@ type Server struct {
 	pullOperationsLock sync.Mutex
 
 	resourceStore *resourcestore.ResourceStore
+
+	metricsServer *http.Server
 }
 
 // pullArguments are used to identify a pullOperation via an input image name and
@@ -628,18 +630,15 @@ func (s *Server) startMetricsServer() error {
 	}
 
 	if s.config.MetricsKey != "" && s.config.MetricsCert != "" {
-		if err := startMetricsEndpoint(
-			"tcp", fmt.Sprintf(":%v", s.config.MetricsPort),
-			s.config.MetricsCert, s.config.MetricsKey, me,
-		); err != nil {
+		if err := s.serveSecureMetrics(me); err != nil {
 			return errors.Wrapf(
 				err,
-				"creating secure metrics endpoint on port %d",
+				"create secure metrics endpoint on port %d",
 				s.config.MetricsPort,
 			)
 		}
 	} else if err := startMetricsEndpoint(
-		"tcp", fmt.Sprintf(":%v", s.config.MetricsPort), "", "", me,
+		"tcp", fmt.Sprintf(":%v", s.config.MetricsPort), me,
 	); err != nil {
 		return errors.Wrapf(
 			err,
@@ -655,7 +654,7 @@ func (s *Server) startMetricsServer() error {
 		}
 
 		return errors.Wrap(
-			startMetricsEndpoint("unix", s.config.MetricsSocket, "", "", me),
+			startMetricsEndpoint("unix", s.config.MetricsSocket, me),
 			"creating path metrics endpoint",
 		)
 	}
@@ -663,23 +662,92 @@ func (s *Server) startMetricsServer() error {
 	return nil
 }
 
-func startMetricsEndpoint(network, address, cert, key string, me *http.ServeMux) error {
+func (s *Server) serveSecureMetrics(me *http.ServeMux) error {
+	reload := make(chan bool)
+	go func() {
+		watcher, err := fsnotify.NewWatcher()
+		if err != nil {
+			logrus.Fatalf("Create file watcher: %v", err)
+		}
+		defer watcher.Close()
+
+		done := make(chan bool)
+		go func() {
+			for {
+				select {
+				case event, ok := <-watcher.Events:
+					if !ok {
+						return
+					}
+					logrus.Debugf("Got file event: %v", event)
+					reload <- true
+				case err := <-watcher.Errors:
+					logrus.Warnf("Metrics watcher: %v", err)
+					close(done)
+					return
+				case <-s.monitorsChan:
+					logrus.Debugf("Closing metrics watcher")
+					close(done)
+					return
+				}
+			}
+		}()
+
+		for _, f := range []string{
+			s.Config().MetricsCert, s.Config().MetricsKey,
+		} {
+			if err := watcher.Add(f); err != nil {
+				logrus.Fatalf("Unable to watch file %s: %v", f, err)
+			}
+			logrus.Infof("Watching file for changes: %s", f)
+		}
+
+		<-done
+	}()
+
+	address := fmt.Sprintf(":%v", s.config.MetricsPort)
+	l, err := net.Listen("tcp", address)
+	if err != nil {
+		return errors.Wrap(err, "creating listener")
+	}
+
+	go func() {
+		for <-reload {
+			if s.metricsServer != nil {
+				logrus.Infof("Reloading metrics server")
+				ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+				defer cancel()
+				if err := s.metricsServer.Shutdown(ctx); err != nil {
+					logrus.Fatalf("Stopping metrics server: %v", err)
+				}
+			}
+
+			s.metricsServer = &http.Server{Handler: me}
+			logrus.Infof("Serving metrics on %s via HTTPs", address)
+			go func() {
+				if err := s.metricsServer.ServeTLS(
+					l, s.Config().MetricsCert, s.Config().MetricsKey,
+				); err != nil {
+					logrus.Fatalf("Failed to serve metrics endpoint %v: %v", l, err)
+				}
+			}()
+		}
+	}()
+
+	reload <- true
+
+	return nil
+}
+
+func startMetricsEndpoint(network, address string, me *http.ServeMux) error {
 	l, err := net.Listen(network, address)
 	if err != nil {
 		return errors.Wrap(err, "creating listener")
 	}
 
 	go func() {
-		var err error
-		if cert != "" && key != "" {
-			logrus.Infof("Serving metrics on %s via HTTPs", address)
-			err = http.ServeTLS(l, me, cert, key)
-		} else {
-			logrus.Infof("Serving metrics on %s via HTTP", address)
-			err = http.Serve(l, me)
-		}
-
-		if err != nil {
+		logrus.Infof("Serving metrics on %s via HTTP", address)
+		if err := http.Serve(l, me); err != nil {
 			logrus.Fatalf("Failed to serve metrics endpoint %v: %v", l, err)
 		}
 	}()
