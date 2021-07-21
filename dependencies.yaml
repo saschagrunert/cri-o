@@ -12,7 +12,7 @@ dependencies:
       match: version
 
   - name: go-legacy
-    version: 1.14
+    version: 1.15
     refPaths:
     - path: .github/workflows/test.yml
       match: GO_VERSION_LEGACY
