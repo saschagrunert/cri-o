@@ -61,12 +61,21 @@ func (r *Runtime) Pull(ctx context.Context, name string, pullPolicy config.PullP
 			if pullPolicy == config.PullPolicyAlways {
 				return nil, errors.Errorf("pull policy is always but image has been referred to by ID (%s)", name)
 			}
-			local, _, err := r.LookupImage(name, &LookupImageOptions{IgnorePlatform: true})
+			local, _, err := r.LookupImage(name, nil)
 			if err != nil {
 				return nil, err
 			}
 			return []*Image{local}, err
 		}
+
+		// Docker compat: strip off the tag iff name is tagged and digested
+		// (e.g., fedora:latest@sha256...).  In that case, the tag is stripped
+		// off and entirely ignored.  The digest is the sole source of truth.
+		normalizedName, normalizeError := normalizeTaggedDigestedString(name)
+		if normalizeError != nil {
+			return nil, normalizeError
+		}
+		name = normalizedName
 
 		// If the input does not include a transport assume it refers
 		// to a registry.
@@ -137,7 +146,7 @@ func (r *Runtime) Pull(ctx context.Context, name string, pullPolicy config.PullP
 
 	localImages := []*Image{}
 	for _, name := range pulledImages {
-		local, _, err := r.LookupImage(name, &LookupImageOptions{IgnorePlatform: true})
+		local, _, err := r.LookupImage(name, nil)
 		if err != nil {
 			return nil, errors.Wrapf(err, "error locating pulled image %q name in containers storage", name)
 		}
@@ -304,6 +313,7 @@ func (r *Runtime) copyFromRegistry(ctx context.Context, ref types.ImageReference
 		return r.copySingleImageFromRegistry(ctx, inputName, pullPolicy, options)
 	}
 
+	// Copy all tags
 	named := reference.TrimNamed(ref.DockerReference())
 	tags, err := registryTransport.GetRepositoryTags(ctx, &r.systemContext, ref)
 	if err != nil {
@@ -352,15 +362,13 @@ func (r *Runtime) copySingleImageFromRegistry(ctx context.Context, imageName str
 	// resolved name for pulling.  Assume we're doing a `pull foo`.
 	// If there's already a local image "localhost/foo", then we should
 	// attempt pulling that instead of doing the full short-name dance.
-	lookupOptions := &LookupImageOptions{
-		// NOTE: we must ignore the platform of a local image when
-		// doing lookups.  Some images set an incorrect or even invalid
-		// platform (see containers/podman/issues/10682).  Doing the
-		// lookup while ignoring the platform checks prevents
-		// redundantly downloading the same image.
-		IgnorePlatform: true,
-	}
-	localImage, resolvedImageName, err = r.LookupImage(imageName, lookupOptions)
+	//
+	// NOTE: we must ignore the platform of a local image when doing
+	// lookups here, even if arch/os/variant is set.  Some images set an
+	// incorrect or even invalid platform (see containers/podman/issues/10682).
+	// Doing the lookup while ignoring the platform checks prevents
+	// redundantly downloading the same image.
+	localImage, resolvedImageName, err = r.LookupImage(imageName, nil)
 	if err != nil && errors.Cause(err) != storage.ErrImageUnknown {
 		logrus.Errorf("Looking up %s in local storage: %v", imageName, err)
 	}
@@ -386,23 +394,8 @@ func (r *Runtime) copySingleImageFromRegistry(ctx context.Context, imageName str
 		// very likely a bug but a consistent one in Podman/Buildah and should
 		// be addressed at a later point.
 		if pullPolicy != config.PullPolicyAlways {
-			switch {
-			// User input clearly refer to a local image.
-			case strings.HasPrefix(imageName, "localhost/"):
-				logrus.Debugf("Enforcing pull policy to %q to support custom platform (arch: %q, os: %q, variant: %q)", "never", options.Architecture, options.OS, options.Variant)
-				pullPolicy = config.PullPolicyNever
-
-			// Image resolved to a local one, so let's still have a
-			// look at the registries or aliases but use it
-			// otherwise.
-			case strings.HasPrefix(resolvedImageName, "localhost/"):
-				logrus.Debugf("Enforcing pull policy to %q to support custom platform (arch: %q, os: %q, variant: %q)", "newer", options.Architecture, options.OS, options.Variant)
-				pullPolicy = config.PullPolicyNewer
-
-			default:
-				logrus.Debugf("Enforcing pull policy to %q to support custom platform (arch: %q, os: %q, variant: %q)", "always", options.Architecture, options.OS, options.Variant)
-				pullPolicy = config.PullPolicyAlways
-			}
+			logrus.Debugf("Enforcing pull policy to %q to support custom platform (arch: %q, os: %q, variant: %q)", "always", options.Architecture, options.OS, options.Variant)
+			pullPolicy = config.PullPolicyAlways
 		}
 	}
 
