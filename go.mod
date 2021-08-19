@@ -14,7 +14,7 @@ require (
 	github.com/containernetworking/cni v0.8.1
 	github.com/containernetworking/plugins v0.9.1
 	github.com/containers/buildah v1.22.0
-	github.com/containers/common v0.43.0
+	github.com/containers/common v0.43.2
 	github.com/containers/conmon v2.0.20+incompatible
 	github.com/containers/image/v5 v5.15.0
 	github.com/containers/ocicrypt v1.1.2
@@ -58,17 +58,17 @@ require (
 	github.com/vishvananda/netlink v1.1.1-0.20201029203352-d40f9887b852
 	golang.org/x/net v0.0.0-20210525063256-abc453219eb5
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
-	golang.org/x/sys v0.0.0-20210616094352-59db8d763f22
-	google.golang.org/grpc v1.39.0
+	golang.org/x/sys v0.0.0-20210630005230-0f9fa26af87c
+	google.golang.org/grpc v1.40.0
 	k8s.io/api v0.21.3
-	k8s.io/apimachinery v0.21.3
+	k8s.io/apimachinery v0.22.0
 	k8s.io/client-go v0.21.2
 	k8s.io/cri-api v0.21.2
 	k8s.io/klog/v2 v2.10.0
 	k8s.io/kubernetes v1.21.2
 	k8s.io/release v0.8.0
 	k8s.io/utils v0.0.0-20210707171843-4b05e18ac7d9
-	mvdan.cc/sh/v3 v3.3.0
+	mvdan.cc/sh/v3 v3.3.1
 	sigs.k8s.io/release-utils v0.3.0
 	sigs.k8s.io/yaml v1.2.0
 	sigs.k8s.io/zeitgeist v0.3.0

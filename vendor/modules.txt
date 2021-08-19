@@ -183,7 +183,7 @@ github.com/containers/buildah/pkg/overlay
 github.com/containers/buildah/pkg/parse
 github.com/containers/buildah/pkg/rusage
 github.com/containers/buildah/util
-# github.com/containers/common v0.43.0
+# github.com/containers/common v0.43.2
 ## explicit
 github.com/containers/common/libimage
 github.com/containers/common/libimage/manifests
@@ -1005,7 +1005,7 @@ golang.org/x/oauth2/internal
 ## explicit
 golang.org/x/sync/errgroup
 golang.org/x/sync/semaphore
-# golang.org/x/sys v0.0.0-20210616094352-59db8d763f22
+# golang.org/x/sys v0.0.0-20210630005230-0f9fa26af87c
 ## explicit
 golang.org/x/sys/cpu
 golang.org/x/sys/execabs
@@ -1013,7 +1013,7 @@ golang.org/x/sys/internal/unsafeheader
 golang.org/x/sys/plan9
 golang.org/x/sys/unix
 golang.org/x/sys/windows
-# golang.org/x/term v0.0.0-20210503060354-a79de5458b56
+# golang.org/x/term v0.0.0-20210615171337-6886f2dfbf5b
 golang.org/x/term
 # golang.org/x/text v0.3.6
 golang.org/x/text/encoding
@@ -1063,7 +1063,7 @@ google.golang.org/appengine/internal/urlfetch
 google.golang.org/appengine/urlfetch
 # google.golang.org/genproto v0.0.0-20210602131652-f16073e35f0c => google.golang.org/genproto v0.0.0-20200117163144-32f20d992d24
 google.golang.org/genproto/googleapis/rpc/status
-# google.golang.org/grpc v1.39.0
+# google.golang.org/grpc v1.40.0
 ## explicit
 google.golang.org/grpc
 google.golang.org/grpc/attributes
@@ -1201,7 +1201,7 @@ k8s.io/api/scheduling/v1beta1
 k8s.io/api/storage/v1
 k8s.io/api/storage/v1alpha1
 k8s.io/api/storage/v1beta1
-# k8s.io/apimachinery v0.21.3 => k8s.io/kubernetes/staging/src/k8s.io/apimachinery v0.0.0-20210804175619-c2b5237ccd9c
+# k8s.io/apimachinery v0.22.0 => k8s.io/kubernetes/staging/src/k8s.io/apimachinery v0.0.0-20210804175619-c2b5237ccd9c
 ## explicit
 k8s.io/apimachinery/pkg/api/errors
 k8s.io/apimachinery/pkg/api/meta
@@ -1567,7 +1567,7 @@ k8s.io/utils/path
 k8s.io/utils/trace
 # mvdan.cc/editorconfig v0.2.0
 mvdan.cc/editorconfig
-# mvdan.cc/sh/v3 v3.3.0
+# mvdan.cc/sh/v3 v3.3.1
 ## explicit
 mvdan.cc/sh/v3/cmd/shfmt
 mvdan.cc/sh/v3/fileutil
