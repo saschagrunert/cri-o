@@ -62,7 +62,7 @@ require (
 	go.opentelemetry.io/otel/sdk v1.1.0
 	golang.org/x/net v0.0.0-20210525063256-abc453219eb5
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
-	golang.org/x/sys v0.0.0-20210910150752-751e447fb3d0
+	golang.org/x/sys v0.0.0-20210925032602-92d5a993a665
 	google.golang.org/grpc v1.42.0
 	k8s.io/api v0.22.2
 	k8s.io/apimachinery v0.22.2
@@ -72,7 +72,7 @@ require (
 	k8s.io/kubernetes v1.22.2
 	k8s.io/release v0.8.0
 	k8s.io/utils v0.0.0-20210819203725-bdf08cb9a70a
-	mvdan.cc/sh/v3 v3.3.1
+	mvdan.cc/sh/v3 v3.4.0
 	sigs.k8s.io/release-utils v0.3.0
 	sigs.k8s.io/yaml v1.3.0
 	sigs.k8s.io/zeitgeist v0.3.0
