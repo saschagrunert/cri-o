@@ -1256,3 +1256,7 @@ func (r *runtimeVM) ServeExecContainer(context.Context, *Container, []string, bo
 func (r *runtimeVM) ServeAttachContainer(context.Context, *Container, bool, bool, bool) (string, error) {
 	return "", nil
 }
+
+func (r *runtimeVM) ServePortForwardContainer(context.Context, *Container, string) (string, error) {
+	return "", nil
+}

@@ -13,6 +13,25 @@ import (
 
 // PortForward prepares a streaming endpoint to forward ports from a PodSandbox.
 func (s *Server) PortForward(ctx context.Context, req *types.PortForwardRequest) (*types.PortForwardResponse, error) {
+	sb := s.GetSandbox(req.PodSandboxId)
+	if sb == nil {
+		return nil, fmt.Errorf("could not find sandbox %s", req.PodSandboxId)
+	}
+
+	netNsPath := sb.NetNsPath()
+	if netNsPath == "" {
+		return nil, fmt.Errorf("network namespace path of sandbox %s is empty", sb.ID())
+	}
+
+	url, err := s.Runtime().ServePortForwardContainer(ctx, sb.InfraContainer(), netNsPath)
+	if err != nil {
+		return nil, fmt.Errorf("could not serve port forward for pod sandbox %q: %w", req.PodSandboxId, err)
+	}
+	if url != "" {
+		log.Infof(ctx, "Using port forward URL from runtime: %v", url)
+		return &types.PortForwardResponse{Url: url}, nil
+	}
+
 	resp, err := s.getPortForward(req)
 	if err != nil {
 		return nil, errors.New("unable to prepare portforward endpoint")

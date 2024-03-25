@@ -199,6 +199,16 @@ func (r *runtimePod) ServeAttachContainer(ctx context.Context, c *Container, std
 	return res.URL, nil
 }
 
+func (r *runtimePod) ServePortForwardContainer(ctx context.Context, c *Container, netNsPath string) (string, error) {
+	res, err := r.client.ServePortForwardContainer(ctx, &conmonClient.ServePortForwardContainerConfig{
+		NetNsPath: netNsPath,
+	})
+	if err != nil {
+		return "", fmt.Errorf("call ServePortForwardContainer RPC: %w", err)
+	}
+	return res.URL, nil
+}
+
 func (r *runtimePod) ExecContainer(ctx context.Context, c *Container, cmd []string, stdin io.Reader, stdout, stderr io.WriteCloser, tty bool, resizeChan <-chan remotecommand.TerminalSize) error {
 	return r.oci.ExecContainer(ctx, c, cmd, stdin, stdout, stderr, tty, resizeChan)
 }

@@ -80,6 +80,7 @@ type RuntimeImpl interface {
 	RestoreContainer(context.Context, *Container, string, string) error
 	ServeExecContainer(context.Context, *Container, []string, bool, bool, bool, bool) (string, error)
 	ServeAttachContainer(context.Context, *Container, bool, bool, bool) (string, error)
+	ServePortForwardContainer(context.Context, *Container, string) (string, error)
 }
 
 // New creates a new Runtime with options provided
@@ -485,4 +486,13 @@ func (r *Runtime) ServeAttachContainer(ctx context.Context, c *Container, stdin,
 	}
 
 	return impl.ServeAttachContainer(ctx, c, stdin, stdout, stderr)
+}
+
+func (r *Runtime) ServePortForwardContainer(ctx context.Context, c *Container, netNsPath string) (string, error) {
+	impl, err := r.RuntimeImpl(c)
+	if err != nil {
+		return "", err
+	}
+
+	return impl.ServePortForwardContainer(ctx, c, netNsPath)
 }
