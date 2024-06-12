@@ -118,10 +118,29 @@ func (s *Server) PullImage(ctx context.Context, req *types.PullImageRequest) (*t
 		return nil, pullOp.err
 	}
 
-	log.Infof(ctx, "Pulled image: %v", pullOp.imageRef)
-	return &types.PullImageResponse{
+	res := &types.PullImageResponse{
 		ImageRef: pullOp.imageRef,
-	}, nil
+	}
+
+	if img.Mount {
+		status, err := s.storageImageStatus(ctx, *img)
+		if err != nil {
+			return nil, fmt.Errorf("get storage image status: %w", err)
+		}
+
+		id := status.ID.IDStringForOutOfProcessConsumptionOnly()
+
+		mountPoint, err := s.Store().MountImage(id, nil, img.MountLabel)
+		if err != nil {
+			return nil, fmt.Errorf("mount image: %w", err)
+		}
+
+		res.Mountpoint = mountPoint
+		log.Infof(ctx, "Image mounted to: %s", res.Mountpoint)
+	}
+
+	log.Infof(ctx, "Pulled image: %v", pullOp.imageRef)
+	return res, nil
 }
 
 // pullImage performs the actual pull operation of PullImage. Used to separate

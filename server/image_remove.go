@@ -3,6 +3,7 @@ package server
 import (
 	"context"
 	"errors"
+	"fmt"
 
 	"github.com/cri-o/cri-o/internal/log"
 	types "k8s.io/cri-api/pkg/apis/runtime/v1"
@@ -49,6 +50,26 @@ func (s *Server) removeImage(ctx context.Context, imageRef string) error {
 		return err
 	}
 	for _, name := range potentialMatches {
+		status, err := s.StorageImageServer().ImageStatusByName(s.config.SystemContext, name)
+		if err != nil {
+			log.Errorf(ctx, "Error getting image status %s: %v", name, err)
+			continue
+		}
+		if status.MountPoint != "" {
+			containerList, err := s.ContainerServer.ListContainers()
+			if err != nil {
+				log.Errorf(ctx, "Error listing containers %s: %v", name, err)
+				continue
+			}
+			for _, container := range containerList {
+				for _, volume := range container.Volumes() {
+					if volume.HostPath == status.MountPoint {
+						return fmt.Errorf("image %q is mounted as volume to container with ID: %s", name, container.ID())
+					}
+				}
+			}
+		}
+
 		err = s.StorageImageServer().UntagImage(s.config.SystemContext, name)
 		if err != nil {
 			log.Debugf(ctx, "Error deleting image %s: %v", name, err)

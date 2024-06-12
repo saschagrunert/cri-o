@@ -56,6 +56,7 @@ type ImageResult struct {
 	OCIConfig           *specs.Image
 	Annotations         map[string]string
 	Pinned              bool // pinned image to prevent it from garbage collection
+	MountPoint          string
 }
 
 type indexInfo struct {
@@ -309,6 +310,16 @@ func (svc *imageService) buildImageResult(image *storage.Image, cacheItem imageC
 			break
 		}
 	}
+
+	mountPoint := ""
+	if m, err := svc.store.Mounted(image.TopLayer); err == nil && m > 0 {
+		if layer, err := svc.store.Layer(image.TopLayer); err == nil {
+			mountPoint = layer.MountPoint
+		} else {
+			logrus.Error("Unable to get image (%s) top layer (%s): %v", image.ID, image.TopLayer, err)
+		}
+	}
+
 	return ImageResult{
 		ID:                  storageImageIDFromImage(image),
 		SomeNameOfThisImage: someName,
@@ -323,6 +334,7 @@ func (svc *imageService) buildImageResult(image *storage.Image, cacheItem imageC
 		OCIConfig:           cacheItem.config,
 		Annotations:         cacheItem.annotations,
 		Pinned:              imagePinned,
+		MountPoint:          mountPoint,
 	}, nil
 }
 

@@ -68,6 +68,7 @@ func ConvertImage(from *storage.ImageResult) *types.Image {
 		RepoTags:    repoTags,
 		RepoDigests: repoDigests,
 		Pinned:      from.Pinned,
+		Mountpoint:  from.MountPoint,
 	}
 
 	uid, username := getUserFromImage(from.User)

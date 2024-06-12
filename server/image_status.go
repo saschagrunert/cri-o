@@ -48,6 +48,7 @@ func (s *Server) ImageStatus(ctx context.Context, req *types.ImageStatusRequest)
 			RepoTags:    status.RepoTags,
 			RepoDigests: status.RepoDigests,
 			Size_:       size,
+			Mountpoint:  status.MountPoint,
 			Spec: &types.ImageSpec{
 				Annotations: status.Annotations,
 			},

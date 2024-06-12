@@ -85,6 +85,8 @@ require (
 	tags.cncf.io/container-device-interface v0.7.2
 )
 
+replace k8s.io/cri-api => github.com/saschagrunert/cri-api v0.0.0-20240618114741-963ea415e294
+
 require (
 	capnproto.org/go/capnp/v3 v3.0.0-alpha.25 // indirect
 	dario.cat/mergo v1.0.0 // indirect

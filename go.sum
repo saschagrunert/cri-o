@@ -1209,6 +1209,8 @@ github.com/russross/blackfriday/v2 v2.1.0 h1:JIOH55/0cWyOuilr9/qlrm0BSXldqnqwMsf
 github.com/russross/blackfriday/v2 v2.1.0/go.mod h1:+Rmxgy9KzJVeS9/2gXHxylqXiyQDYRxCVz55jmeOWTM=
 github.com/ruudk/golang-pdf417 v0.0.0-20181029194003-1af4ab5afa58/go.mod h1:6lfFZQK844Gfx8o5WFuvpxWRwnSoipWe/p622j1v06w=
 github.com/ruudk/golang-pdf417 v0.0.0-20201230142125-a7e3863a1245/go.mod h1:pQAZKsJ8yyVxGRWYNEm9oFB8ieLgKFnamEyDmSA0BRk=
+github.com/saschagrunert/cri-api v0.0.0-20240618114741-963ea415e294 h1:L6wIf3yxURJUr6gup60pT2dreV8CwlbjCqLZ2Mb/CdQ=
+github.com/saschagrunert/cri-api v0.0.0-20240618114741-963ea415e294/go.mod h1:8SzLKTnltnWXG9FMIL4SHWcAnnPGssi5viN/SMMMf4k=
 github.com/sebdah/goldie/v2 v2.5.3 h1:9ES/mNN+HNUbNWpVAlrzuZ7jE+Nrczbj8uFRjM7624Y=
 github.com/sebdah/goldie/v2 v2.5.3/go.mod h1:oZ9fp0+se1eapSRjfYbsV/0Hqhbuu3bJVvKI/NNtssI=
 github.com/seccomp/libseccomp-golang v0.10.0 h1:aA4bp+/Zzi0BnWZ2F1wgNBs5gTpm+na2rWM6M9YjLpY=
@@ -2086,8 +2088,6 @@ k8s.io/apiserver v0.30.2 h1:ACouHiYl1yFI2VFI3YGM+lvxgy6ir4yK2oLOsLI1/tw=
 k8s.io/apiserver v0.30.2/go.mod h1:BOTdFBIch9Sv0ypSEcUR6ew/NUFGocRFNl72Ra7wTm8=
 k8s.io/client-go v0.30.2 h1:sBIVJdojUNPDU/jObC+18tXWcTJVcwyqS9diGdWHk50=
 k8s.io/client-go v0.30.2/go.mod h1:JglKSWULm9xlJLx4KCkfLLQ7XwtlbflV6uFFSHTMgVs=
-k8s.io/cri-api v0.30.2 h1:4KR5W6ziqfGzKYVmFG9AEOJzxNbCPyZMoeCeIlK9jew=
-k8s.io/cri-api v0.30.2/go.mod h1://4/umPJSW1ISNSNng4OwjpkvswJOQwU8rnkvO8P+xg=
 k8s.io/klog/v2 v2.130.0 h1:5nB3+3HpqKqXJIXNtJdtxcDCfaa9KL8StJgMzGJkUkM=
 k8s.io/klog/v2 v2.130.0/go.mod h1:3Jpz1GvMt720eyJH1ckRHK1EDfpxISzJ7I9OYgaDtPE=
 k8s.io/kube-openapi v0.0.0-20240228011516-70dd3763d340 h1:BZqlfIlq5YbRMFko6/PM7FjZpUb45WallggurYhKGag=
