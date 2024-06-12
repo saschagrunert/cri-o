@@ -48,6 +48,7 @@ func (s *Server) ImageStatus(ctx context.Context, req *types.ImageStatusRequest)
 			RepoTags:    status.RepoTags,
 			RepoDigests: status.RepoDigests,
 			Size_:       size,
+			MountRef:    status.MountPoint,
 			Spec: &types.ImageSpec{
 				Annotations: status.Annotations,
 			},
@@ -71,6 +72,7 @@ func (s *Server) ImageStatus(ctx context.Context, req *types.ImageStatusRequest)
 
 // storageImageStatus calls ImageStatus for a k8s ImageSpec.
 // Returns (nil, nil) if image was not found.
+// nolint:gocritic // intentional copy
 func (s *Server) storageImageStatus(ctx context.Context, spec types.ImageSpec) (*pkgstorage.ImageResult, error) {
 	if id := s.StorageImageServer().HeuristicallyTryResolvingStringAsIDPrefix(spec.Image); id != nil {
 		status, err := s.StorageImageServer().ImageStatusByID(s.config.SystemContext, *id)
