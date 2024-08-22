@@ -20,17 +20,17 @@ require (
 	github.com/containerd/typeurl v1.0.3-0.20220422153119-7f6e6d160d67
 	github.com/containernetworking/cni v1.2.3
 	github.com/containernetworking/plugins v1.5.1
-	github.com/containers/common v0.60.1
+	github.com/containers/common v0.60.2
 	github.com/containers/conmon v2.0.20+incompatible
 	github.com/containers/conmon-rs v0.6.5
-	github.com/containers/image/v5 v5.32.1
+	github.com/containers/image/v5 v5.32.2
 	github.com/containers/kubensmnt v1.2.0
 	github.com/containers/ocicrypt v1.2.0
 	github.com/containers/storage v1.55.0
 	github.com/coreos/go-systemd/v22 v22.5.1-0.20231103132048-7d375ecc2b09
 	github.com/cpuguy83/go-md2man v1.0.10
 	github.com/creack/pty v1.1.23
-	github.com/cri-o/ocicni v0.4.2
+	github.com/cri-o/ocicni v0.4.3
 	github.com/cyphar/filepath-securejoin v0.3.1
 	github.com/docker/distribution v2.8.3+incompatible
 	github.com/docker/go-units v0.5.0
@@ -48,7 +48,7 @@ require (
 	github.com/json-iterator/go v1.1.12
 	github.com/kata-containers/kata-containers/src/runtime v0.0.0-20240208092920-b99f57452225
 	github.com/moby/sys/mountinfo v0.7.2
-	github.com/onsi/ginkgo/v2 v2.20.0
+	github.com/onsi/ginkgo/v2 v2.20.1
 	github.com/onsi/gomega v1.34.1
 	github.com/opencontainers/go-digest v1.0.0
 	github.com/opencontainers/image-spec v1.1.0
@@ -56,7 +56,7 @@ require (
 	github.com/opencontainers/runtime-spec v1.2.0
 	github.com/opencontainers/runtime-tools v0.9.1-0.20230914150019-408c51e934dc
 	github.com/opencontainers/selinux v1.11.0
-	github.com/prometheus/client_golang v1.20.0
+	github.com/prometheus/client_golang v1.20.1
 	github.com/seccomp/libseccomp-golang v0.10.0
 	github.com/sirupsen/logrus v1.9.3
 	github.com/soheilhy/cmux v0.1.5
