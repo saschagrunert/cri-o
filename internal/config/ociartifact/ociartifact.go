@@ -8,12 +8,14 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"slices"
 	"time"
 
 	"github.com/containers/image/v5/docker/reference"
 	"github.com/containers/image/v5/manifest"
 	"github.com/containers/image/v5/pkg/blobinfocache"
 	"github.com/containers/image/v5/types"
+	specs "github.com/opencontainers/image-spec/specs-go/v1"
 
 	"github.com/cri-o/cri-o/internal/log"
 )
@@ -313,4 +315,60 @@ func verifyDigest(layer *manifest.LayerInfo, layerBytes []byte) error {
 	}
 
 	return nil
+}
+
+// ErrIsAnImage is indicating that the artifact is a container image.
+var ErrIsAnImage = errors.New("provided artifact is a container image")
+
+// IsValid returns nil if the provided reference is a valid OCI artifact. It also returns:
+// - ErrIsAnImage if the artifact is a container image.
+// - any other error if something else fails.
+func (o *OCIArtifact) IsValid(ctx context.Context, systemContext *types.SystemContext, ref types.ImageReference) (manifestMimeType, configMediaType string, err error) {
+	strRef := ref.DockerReference().String()
+	log.Debugf(ctx, "Checking if source reference is an OCI artifact: %v", strRef)
+
+	src, err := o.impl.NewImageSource(ctx, ref, systemContext)
+	if err != nil {
+		return "", "", fmt.Errorf("build image source: %w", err)
+	}
+
+	manifestBytes, mimeType, err := o.impl.GetManifest(ctx, src, nil)
+	if err != nil {
+		return "", "", fmt.Errorf("get manifest: %w", err)
+	}
+
+	log.Debugf(ctx, "Manifest mime type of %s: %s", strRef, mimeType)
+
+	listMimeTypes := []string{
+		specs.MediaTypeImageIndex,
+		manifest.DockerV2ListMediaType,
+	}
+	if slices.Contains(listMimeTypes, mimeType) {
+		return mimeType, "", ErrIsAnImage
+	}
+
+	parsedManifest, err := o.impl.ManifestFromBlob(manifestBytes, mimeType)
+	if err != nil {
+		return mimeType, "", fmt.Errorf("parse manifest from blob: %w", err)
+	}
+
+	mediaType := parsedManifest.ConfigInfo().MediaType
+	log.Debugf(ctx, "Config media type of %s: %s", strRef, mediaType)
+
+	imageMimeTypes := []string{
+		specs.MediaTypeImageManifest,
+		manifest.DockerV2Schema2MediaType,
+		manifest.DockerV2Schema1SignedMediaType,
+	}
+	configMediaTypes := []string{
+		"", // empty
+		specs.MediaTypeImageConfig,
+		manifest.DockerV2Schema2ConfigMediaType,
+	}
+
+	if slices.Contains(imageMimeTypes, mimeType) && slices.Contains(configMediaTypes, mediaType) {
+		return mimeType, mediaType, ErrIsAnImage
+	}
+
+	return mimeType, mediaType, nil
 }

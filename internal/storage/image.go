@@ -35,6 +35,7 @@ import (
 	"github.com/sirupsen/logrus"
 	crierrors "k8s.io/cri-api/pkg/errors"
 
+	"github.com/cri-o/cri-o/internal/config/ociartifact"
 	"github.com/cri-o/cri-o/internal/log"
 	"github.com/cri-o/cri-o/internal/storage/references"
 	"github.com/cri-o/cri-o/pkg/config"
@@ -869,6 +870,15 @@ func pullImageImplementation(ctx context.Context, lookup *imageLookupService, st
 	policyContext, err := signature.NewPolicyContext(policy)
 	if err != nil {
 		return RegistryImageReference{}, err
+	}
+
+	if manifestMimeType, configMediaType, err := ociartifact.New().IsValid(ctx, &srcSystemContext, srcRef); err == nil {
+		return RegistryImageReference{}, fmt.Errorf(
+			"source ref %s has manifest mime type %q and config media type %q which is considered to be an OCI artifact",
+			srcRef.DockerReference().String(), manifestMimeType, configMediaType,
+		)
+	} else if err != nil && !errors.Is(err, ociartifact.ErrIsAnImage) {
+		return RegistryImageReference{}, fmt.Errorf("unable verify possible OCI artifact: %w", err)
 	}
 
 	manifestBytes, err := copy.Image(ctx, policyContext, destRef, srcRef, &copy.Options{
