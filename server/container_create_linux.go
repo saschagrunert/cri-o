@@ -12,10 +12,13 @@ import (
 
 	"github.com/containers/storage/pkg/idtools"
 	"github.com/containers/storage/pkg/mount"
+	securejoin "github.com/cyphar/filepath-securejoin"
 	"github.com/intel/goresctrl/pkg/blockio"
 	rspec "github.com/opencontainers/runtime-spec/specs-go"
 	"github.com/opencontainers/runtime-tools/generate"
+	"golang.org/x/sys/unix"
 	types "k8s.io/cri-api/pkg/apis/runtime/v1"
+	crierrors "k8s.io/cri-api/pkg/errors"
 
 	"github.com/cri-o/cri-o/internal/config/device"
 	"github.com/cri-o/cri-o/internal/config/node"
@@ -205,7 +208,7 @@ func (s *Server) addOCIBindMounts(ctx context.Context, ctr ctrfactory.Container,
 		if m.Image != nil && m.Image.Image != "" {
 			volume, err := s.mountImage(ctx, specgen, imageVolumesPath, m)
 			if err != nil {
-				return nil, nil, fmt.Errorf("mount image: %w", err)
+				return nil, nil, fmt.Errorf("%w: %w", crierrors.ErrImageVolumeMountFailed, err)
 			}
 
 			volumes = append(volumes, *volume)
@@ -387,7 +390,7 @@ func (s *Server) mountImage(ctx context.Context, specgen *generate.Generator, im
 		return nil, fmt.Errorf("invalid mount specified: %+v", m)
 	}
 
-	log.Debugf(ctx, "Image ref to mount: %s", m.Image.Image)
+	log.Debugf(ctx, "Image ref to mount under sub path %q: %s", m.ImageSubPath, m.Image.Image)
 
 	status, err := s.storageImageStatus(ctx, types.ImageSpec{Image: m.Image.Image})
 	if err != nil {
@@ -410,6 +413,25 @@ func (s *Server) mountImage(ctx context.Context, specgen *generate.Generator, im
 	}
 
 	log.Infof(ctx, "Image mounted to: %s", mountPoint)
+
+	// Kubernetes already verifies that ImageSubPath:
+	// - is a relative path
+	// - does not contain any '..'
+	//
+	// We cannot create non-existing paths within the image volume because
+	// they're mounted read-only.
+	mountPointFile, err := securejoin.OpenInRoot(mountPoint, m.ImageSubPath)
+	if err != nil {
+		// This is a user-facing error message from a kubelet event, means we should make it as meaningful as possible.
+		if errors.Is(err, unix.ENOENT) {
+			return nil, fmt.Errorf("sub path %q does not exist in image volume %q", m.ImageSubPath, m.Image.Image)
+		}
+
+		return nil, fmt.Errorf("join final mount path: %w", err)
+	}
+
+	mountPoint = mountPointFile.Name()
+	log.Debugf(ctx, "Using final mount path: %s", mountPoint)
 
 	const overlay = "overlay"
 
