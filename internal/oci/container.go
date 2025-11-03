@@ -114,8 +114,8 @@ type ContainerVolume struct {
 type ContainerState struct {
 	specs.State
 	Created       time.Time `json:"created"`
-	Started       time.Time `json:"started,omitempty"`
-	Finished      time.Time `json:"finished,omitempty"`
+	Started       time.Time `json:"started"`
+	Finished      time.Time `json:"finished"`
 	ExitCode      *int32    `json:"exitCode,omitempty"`
 	OOMKilled     bool      `json:"oomKilled,omitempty"`
 	SeccompKilled bool      `json:"seccompKilled,omitempty"`
@@ -126,7 +126,7 @@ type ContainerState struct {
 	// is the same as the corresponding PID on the host.
 	InitStartTime string `json:"initStartTime,omitempty"`
 	// Checkpoint/Restore related states
-	CheckpointedAt time.Time `json:"checkpointedTime,omitempty"`
+	CheckpointedAt time.Time `json:"checkpointedTime"`
 	// ContainerMonitorProcess is used to check the liveness of the container monitor.
 	// This is supposed to be immutable once set.
 	ContainerMonitorProcess *ContainerMonitorProcess `json:"containerMonitorProcess,omitempty"`
