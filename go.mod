@@ -6,7 +6,7 @@ require (
 	github.com/BurntSushi/toml v1.5.0
 	github.com/Microsoft/go-winio v0.6.2
 	github.com/blang/semver/v4 v4.0.0
-	github.com/checkpoint-restore/checkpointctl v1.4.0
+	github.com/checkpoint-restore/checkpointctl v1.4.1
 	github.com/checkpoint-restore/go-criu/v7 v7.2.0
 	github.com/containerd/cgroups v1.1.0
 	github.com/containerd/containerd v1.7.29
@@ -75,19 +75,19 @@ require (
 	golang.org/x/sys v0.39.0
 	google.golang.org/grpc v1.77.0
 	google.golang.org/protobuf v1.36.10
-	k8s.io/api v0.35.0-rc.0
-	k8s.io/apimachinery v0.35.0-rc.0
-	k8s.io/client-go v0.35.0-rc.0
-	k8s.io/cri-api v0.35.0-rc.0
-	k8s.io/cri-client v0.35.0-rc.0
+	k8s.io/api v0.36.0-alpha.0
+	k8s.io/apimachinery v0.36.0-alpha.0
+	k8s.io/client-go v0.36.0-alpha.0
+	k8s.io/cri-api v0.36.0-alpha.0
+	k8s.io/cri-client v0.36.0-alpha.0
 	k8s.io/klog/v2 v2.130.1
-	k8s.io/kubelet v0.35.0-rc.0
+	k8s.io/kubelet v0.36.0-alpha.0
 	k8s.io/utils v0.0.0-20251002143259-bc988d571ff4
 	sigs.k8s.io/knftables v0.0.19
 	sigs.k8s.io/release-sdk v0.12.5
 	sigs.k8s.io/release-utils v0.12.2
 	sigs.k8s.io/yaml v1.6.0
-	tags.cncf.io/container-device-interface v1.0.2-0.20251126141844-16a1328247ae
+	tags.cncf.io/container-device-interface v1.1.0
 )
 
 require (
@@ -248,13 +248,13 @@ require (
 	gopkg.in/inf.v0 v0.9.1 // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
-	k8s.io/apiserver v0.35.0-rc.0 // indirect
-	k8s.io/component-base v0.35.0-rc.0 // indirect
+	k8s.io/apiserver v0.36.0-alpha.0 // indirect
+	k8s.io/component-base v0.36.0-alpha.0 // indirect
 	k8s.io/kube-openapi v0.0.0-20250910181357-589584f1c912 // indirect
 	sigs.k8s.io/json v0.0.0-20250730193827-2d320260d730 // indirect
 	sigs.k8s.io/randfill v1.0.0 // indirect
 	sigs.k8s.io/structured-merge-diff/v6 v6.3.0 // indirect
-	tags.cncf.io/container-device-interface/specs-go v1.0.1-0.20251126141844-16a1328247ae // indirect
+	tags.cncf.io/container-device-interface/specs-go v1.1.0 // indirect
 )
 
 replace github.com/cyphar/filepath-securejoin => github.com/cyphar/filepath-securejoin v0.4.1

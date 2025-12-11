@@ -86,8 +86,8 @@ github.com/cenkalti/backoff/v5
 # github.com/cespare/xxhash/v2 v2.3.0
 ## explicit; go 1.11
 github.com/cespare/xxhash/v2
-# github.com/checkpoint-restore/checkpointctl v1.4.0
-## explicit; go 1.23.0
+# github.com/checkpoint-restore/checkpointctl v1.4.1
+## explicit; go 1.24.6
 github.com/checkpoint-restore/checkpointctl/lib
 # github.com/checkpoint-restore/go-criu/v7 v7.2.0
 ## explicit; go 1.20
@@ -1437,7 +1437,7 @@ gopkg.in/warnings.v0
 # gopkg.in/yaml.v3 v3.0.1
 ## explicit
 gopkg.in/yaml.v3
-# k8s.io/api v0.35.0-rc.0
+# k8s.io/api v0.36.0-alpha.0
 ## explicit; go 1.25.0
 k8s.io/api/admissionregistration/v1
 k8s.io/api/admissionregistration/v1alpha1
@@ -1496,7 +1496,7 @@ k8s.io/api/storage/v1
 k8s.io/api/storage/v1alpha1
 k8s.io/api/storage/v1beta1
 k8s.io/api/storagemigration/v1beta1
-# k8s.io/apimachinery v0.35.0-rc.0
+# k8s.io/apimachinery v0.36.0-alpha.0
 ## explicit; go 1.25.0
 k8s.io/apimachinery/pkg/api/equality
 k8s.io/apimachinery/pkg/api/errors
@@ -1558,10 +1558,10 @@ k8s.io/apimachinery/pkg/watch
 k8s.io/apimachinery/third_party/forked/golang/json
 k8s.io/apimachinery/third_party/forked/golang/netutil
 k8s.io/apimachinery/third_party/forked/golang/reflect
-# k8s.io/apiserver v0.35.0-rc.0
+# k8s.io/apiserver v0.36.0-alpha.0
 ## explicit; go 1.25.0
 k8s.io/apiserver/pkg/endpoints/responsewriter
-# k8s.io/client-go v0.35.0-rc.0
+# k8s.io/client-go v0.36.0-alpha.0
 ## explicit; go 1.25.0
 k8s.io/client-go/applyconfigurations/admissionregistration/v1
 k8s.io/client-go/applyconfigurations/admissionregistration/v1alpha1
@@ -1699,7 +1699,7 @@ k8s.io/client-go/util/exec
 k8s.io/client-go/util/flowcontrol
 k8s.io/client-go/util/keyutil
 k8s.io/client-go/util/workqueue
-# k8s.io/component-base v0.35.0-rc.0
+# k8s.io/component-base v0.36.0-alpha.0
 ## explicit; go 1.25.0
 k8s.io/component-base/featuregate
 k8s.io/component-base/logs/logreduction
@@ -1710,12 +1710,12 @@ k8s.io/component-base/metrics/prometheusextension
 k8s.io/component-base/tracing
 k8s.io/component-base/tracing/api/v1
 k8s.io/component-base/version
-# k8s.io/cri-api v0.35.0-rc.0
+# k8s.io/cri-api v0.36.0-alpha.0
 ## explicit; go 1.25.0
 k8s.io/cri-api/pkg/apis
 k8s.io/cri-api/pkg/apis/runtime/v1
 k8s.io/cri-api/pkg/errors
-# k8s.io/cri-client v0.35.0-rc.0
+# k8s.io/cri-client v0.36.0-alpha.0
 ## explicit; go 1.25.0
 k8s.io/cri-client/pkg
 k8s.io/cri-client/pkg/internal
@@ -1741,7 +1741,7 @@ k8s.io/kube-openapi/pkg/spec3
 k8s.io/kube-openapi/pkg/util
 k8s.io/kube-openapi/pkg/util/proto
 k8s.io/kube-openapi/pkg/validation/spec
-# k8s.io/kubelet v0.35.0-rc.0
+# k8s.io/kubelet v0.36.0-alpha.0
 ## explicit; go 1.25.0
 k8s.io/kubelet/pkg/cri/streaming
 k8s.io/kubelet/pkg/cri/streaming/portforward
@@ -1789,13 +1789,13 @@ sigs.k8s.io/structured-merge-diff/v6/value
 # sigs.k8s.io/yaml v1.6.0
 ## explicit; go 1.22
 sigs.k8s.io/yaml
-# tags.cncf.io/container-device-interface v1.0.2-0.20251126141844-16a1328247ae
+# tags.cncf.io/container-device-interface v1.1.0
 ## explicit; go 1.21
 tags.cncf.io/container-device-interface/internal/validation
 tags.cncf.io/container-device-interface/internal/validation/k8s
 tags.cncf.io/container-device-interface/pkg/cdi
 tags.cncf.io/container-device-interface/pkg/parser
-# tags.cncf.io/container-device-interface/specs-go v1.0.1-0.20251126141844-16a1328247ae
+# tags.cncf.io/container-device-interface/specs-go v1.1.0
 ## explicit; go 1.19
 tags.cncf.io/container-device-interface/specs-go
 # github.com/cyphar/filepath-securejoin => github.com/cyphar/filepath-securejoin v0.4.1
