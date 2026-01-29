@@ -125,27 +125,9 @@ func (s *Server) PullImage(ctx context.Context, req *types.PullImageRequest) (*t
 
 	log.Infof(ctx, "Pulled image: %v", pullOp.imageRef)
 
-	// Get the image status to retrieve the image ID (config hash) instead of returning
-	// the repo digest. This ensures consistency with containerd and compatibility with
-	// Kubernetes credential verification which expects PullImage and GetImageRef to
-	// return compatible values that can be used as keys for pull record lookups.
-	imageStatus, err := s.ContainerServer.StorageImageServer().ImageStatusByName(s.config.SystemContext, pullOp.imageRef)
-	if err == nil {
-		return &types.PullImageResponse{
-			ImageRef: imageStatus.ID.IDStringForOutOfProcessConsumptionOnly(),
-		}, nil
-	}
-
-	// If not found in regular image storage, check if it's an OCI artifact
-	artifact, artifactErr := s.ArtifactStore().Status(ctx, pullOp.imageRef.StringForOutOfProcessConsumptionOnly())
-	if artifactErr == nil {
-		return &types.PullImageResponse{
-			ImageRef: artifact.CRIImage().GetId(),
-		}, nil
-	}
-
-	// Neither regular image nor artifact found, return the original error
-	return nil, fmt.Errorf("get image status after pull: %w", err)
+	return &types.PullImageResponse{
+		ImageRef: pullOp.imageRef.StringForOutOfProcessConsumptionOnly(),
+	}, nil
 }
 
 // pullImage performs the actual pull operation of PullImage. Used to separate

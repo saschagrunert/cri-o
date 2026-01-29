@@ -27,19 +27,14 @@ var _ = t.Describe("ImagePull", func() {
 	AfterEach(afterEach)
 
 	t.Describe("ImagePull", func() {
-		It("should succeed with pull and return image ID", func() {
+		It("should succeed with pull", func() {
 			// Given
-			const idHex = "1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef"
-			imageID, err := storage.ParseStorageImageIDFromOutOfProcessData(idHex)
-			Expect(err).ToNot(HaveOccurred())
 			gomock.InOrder(
 				imageServerMock.EXPECT().CandidatesForPotentiallyShortImageName(
 					gomock.Any(), "image").
 					Return([]storage.RegistryImageReference{imageCandidate}, nil),
 				imageServerMock.EXPECT().PullImage(gomock.Any(), imageCandidate, gomock.Any()).
 					Return(canonicalImageCandidate, nil),
-				imageServerMock.EXPECT().ImageStatusByName(gomock.Any(), canonicalImageCandidate).
-					Return(&storage.ImageResult{ID: imageID}, nil),
 			)
 
 			// When
@@ -51,7 +46,6 @@ var _ = t.Describe("ImagePull", func() {
 			// Then
 			Expect(err).ToNot(HaveOccurred())
 			Expect(response).NotTo(BeNil())
-			Expect(response.GetImageRef()).To(Equal(idHex))
 		})
 
 		It("should fail credential decode errors", func() {
