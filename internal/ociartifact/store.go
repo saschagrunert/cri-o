@@ -44,6 +44,12 @@ var configMediaTypes = []string{
 	manifest.DockerV2Schema2ConfigMediaType,
 }
 
+// additionalStore pairs a read-only artifact store with its path.
+type additionalStore struct {
+	path  string
+	store LibartifactStore
+}
+
 // Store is the main structure to build an artifact storage.
 type Store struct {
 	libartifactStore LibartifactStore
@@ -51,8 +57,7 @@ type Store struct {
 
 	// rootPath is required for BlobMountPaths.
 	rootPath         string
-	additionalPaths  []string
-	additionalStores []LibartifactStore
+	additionalStores []additionalStore
 }
 
 // NewStore creates a new OCI artifact store.
@@ -65,8 +70,7 @@ func NewStore(rootPath string, additionalPaths []string, systemContext *types.Sy
 	}
 
 	// Configure additional stores (RO)
-	var additionalStores []LibartifactStore
-	var validAdditionalPaths []string
+	var additional []additionalStore
 
 	for _, path := range additionalPaths {
 		addPath := filepath.Join(path, "artifacts")
@@ -74,18 +78,21 @@ func NewStore(rootPath string, additionalPaths []string, systemContext *types.Sy
 		addStore, err := libart.NewArtifactStore(addPath, systemContext)
 		if err != nil {
 			log.Warnf(context.Background(), "Skipping additional artifact store %q: %v", addPath, err)
+
 			continue
 		}
-		additionalStores = append(additionalStores, &artifactStore{addStore})
-		validAdditionalPaths = append(validAdditionalPaths, addPath)
+
+		additional = append(additional, additionalStore{
+			path:  addPath,
+			store: &artifactStore{addStore},
+		})
 	}
 
 	return &Store{
 		libartifactStore: &artifactStore{store},
 		impl:             &defaultImpl{},
 		rootPath:         storePath,
-		additionalPaths:  validAdditionalPaths,
-		additionalStores: additionalStores,
+		additionalStores: additional,
 	}, nil
 }
 
@@ -104,13 +111,15 @@ func (s *Store) Pull(
 
 	strRef := ref.DockerReference().String()
 
-	// Skip pulling if the artifact already exists in a read-only additional store.
-	// Note: Because we short-circuit here, tag re-pointing for artifacts present
-	// in additional stores is not supported. If a user needs to force-pull a new
-	// digest for a tag, the artifact must not exist in the read-only store.
-	if art, err := s.Status(ctx, strRef); err == nil && art.RootPath() != s.rootPath {
-		log.Infof(ctx, "Artifact %s found locally in additional read-only store, skipping pull", strRef)
+	// Skip pulling if the artifact already exists in any store (including
+	// read-only additional stores). This avoids duplicating artifacts that
+	// are already available and prevents unnecessary network traffic.
+	// To force a re-pull (e.g., after a tag re-point), the artifact must
+	// be removed first.
+	if art, err := s.Status(ctx, strRef); err == nil {
+		log.Infof(ctx, "Artifact %s already exists locally in %s, skipping pull", strRef, art.RootPath())
 		dgst := art.Digest()
+
 		return &dgst, nil
 	}
 
@@ -205,14 +214,16 @@ func (s *Store) List(ctx context.Context) (res []*Artifact, err error) {
 	// We warn and continue on errors here because additional stores may
 	// reside on unreliable media (like NFS) and shouldn't block listing
 	// artifacts from the main store.
-	for i, addStore := range s.additionalStores {
-		addArts, err := addStore.List(ctx)
+	for _, add := range s.additionalStores {
+		addArts, err := add.store.List(ctx)
 		if err != nil {
-			log.Warnf(ctx, "Failed to list artifacts from additional store %q: %v", s.additionalPaths[i], err)
+			log.Warnf(ctx, "Failed to list artifacts from additional store %q: %v", add.path, err)
+
 			continue
 		}
+
 		for _, art := range addArts {
-			arts = append(arts, NewArtifact(art, s.additionalPaths[i]))
+			arts = append(arts, NewArtifact(art, add.path))
 		}
 	}
 
@@ -221,6 +232,7 @@ func (s *Store) List(ctx context.Context) (res []*Artifact, err error) {
 	if err != nil {
 		return nil, fmt.Errorf("list artifacts from main store: %w", err)
 	}
+
 	for _, art := range mainArts {
 		arts = append(arts, NewArtifact(art, s.rootPath))
 	}
@@ -229,12 +241,15 @@ func (s *Store) List(ctx context.Context) (res []*Artifact, err error) {
 	// We include the reference in the key so that the same blob with
 	// different tags (e.g., :v1 and :latest) will correctly appear twice.
 	seen := make(map[string]struct{})
+
 	for _, artifact := range arts {
 		key := fmt.Sprintf("%s@%s", artifact.Reference(), artifact.Digest().Encoded())
 		if _, ok := seen[key]; ok {
 			continue
 		}
+
 		seen[key] = struct{}{}
+
 		res = append(res, artifact)
 	}
 
@@ -250,11 +265,16 @@ func (s *Store) Status(ctx context.Context, nameOrDigest string) (*Artifact, err
 	}
 
 	// Check additional stores first (Prioritized)
-	for i, store := range s.additionalStores {
-		if artifact, err := store.Inspect(ctx, artRef); err == nil {
-			return NewArtifact(artifact, s.additionalPaths[i]), nil
+	for _, add := range s.additionalStores {
+		artifact, err := add.store.Inspect(ctx, artRef)
+		if err == nil {
+			return NewArtifact(artifact, add.path), nil
+		}
+
+		if errors.Is(err, ErrNotFound) {
+			log.Debugf(ctx, "Artifact not found in additional store %q", add.path)
 		} else {
-			log.Debugf(ctx, "Inspect in additional store %q failed: %v", s.additionalPaths[i], err)
+			log.Warnf(ctx, "Failed to inspect artifact in additional store %q: %v", add.path, err)
 		}
 	}
 
@@ -311,6 +331,7 @@ func (s *Store) BlobMountPaths(ctx context.Context, artifact *Artifact, sys *typ
 		name := artifactName(l.Annotations)
 		if name == "" {
 			log.Warnf(ctx, "Unable to find name for artifact layer which makes it not mountable")
+
 			continue
 		}
 
