@@ -1024,8 +1024,9 @@ func (s *Server) setupContainerEnvironmentAndWorkdir(ctx context.Context, specge
 	// Add environment variables from image the CRI configuration
 	envs := mergeEnvs(containerImageConfig, containerConfig.GetEnvs())
 	for _, e := range envs {
-		parts := strings.SplitN(e, "=", 2)
-		specgen.AddProcessEnv(parts[0], parts[1])
+		if key, value, ok := strings.Cut(e, "="); ok && key != "" {
+			specgen.AddProcessEnv(key, value)
+		}
 	}
 
 	// Setup user and groups
